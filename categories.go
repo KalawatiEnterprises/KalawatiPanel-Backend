@@ -18,7 +18,7 @@
 
 package main
 
-import "fmt"
+import "strconv"
 
 type Category struct {
   ID     int
@@ -39,12 +39,119 @@ func getCategory(categoryId int) Category {
     panic(err)
   }
 
-  var parentCategory Category
   if parentId != nil {
-    parentCategory = getCategory(*parentId)
+    parentCategory := getCategory(*parentId)
+    category.Parent = &parentCategory
   }
-  fmt.Println(parentCategory)
 
   return category
 }
 
+func getAllCategories() []Category {
+  rows, err := db.Query("SELECT ID, ParentID, Name FROM Categories")
+  if err != nil {
+    panic(err)
+  }
+  defer rows.Close()
+
+  var categories []Category
+  for rows.Next() {
+    var c Category
+    var parentId *int
+
+    if err := rows.Scan(&c.ID, &parentId, &c.Name); err != nil {
+      panic(err)
+    }
+
+    if parentId != nil {
+      parentCategory := getCategory(*parentId)
+      c.Parent = &parentCategory
+    }
+
+    categories = append(categories, c)
+  }
+
+  return categories
+}
+
+func insertCategory(c Category) bool {
+  query, err := db.Prepare("INSERT INTO Categories (ParentID, Name) VALUES (?, ?)")
+  if err != nil {
+    panic(err)
+  }
+  defer query.Close()
+
+  _, err = query.Exec(c.Parent.ID, c.Name)
+  if err != nil {
+    panic(err)
+  }
+
+  return true
+}
+
+func getCategoryChildren(parentId int) []int {
+  rows, err := db.Query("SELECT ID FROM Categories WHERE ParentID = " + strconv.Itoa(parentId))
+  if err != nil {
+    panic(err)
+  }
+
+  var children []int
+  for rows.Next() {
+    var c int
+    if err := rows.Scan(&c); err != nil {
+      panic(err)
+    }
+
+    children = append(children, c)
+  }
+
+  return children
+}
+
+func deleteCategory(categoryId int) bool {
+  // else it will delete EVERYTHING
+  if categoryId < 1 { return false }
+
+  // delete associated products first
+  query, err := db.Prepare("DELETE From Product_Categories WHERE CategoryID = ?")
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(categoryId)
+  if err != nil {
+    panic(err)
+  }
+
+  // if category is deleted children are also deleted
+  query, err = db.Prepare("DELETE FROM Categories WHERE ID = ?")
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(categoryId)
+  if err != nil {
+    panic(err)
+  }
+
+  for _, i := range getCategoryChildren(categoryId) {
+    deleteCategory(i)
+  }
+
+  return true
+}
+
+func updateCategory(c Category) bool {
+  query, err := db.Prepare(`
+  UPDATE Categories SET
+  ParentID = ?,
+  Name     = ?
+  WHERE ID = ?`)
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(c.Parent.ID, c.Name, c.ID)
+  if err != nil {
+    panic(err)
+  }
+
+  return true
+}

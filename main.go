@@ -87,5 +87,35 @@ func main() {
     ctx.JSON(200, updateBrand(brand))
   })
 
+  // category routes
+  r.GET("/api/categories", func (ctx *gin.Context) {
+    ctx.Header("Content-Type", "application/json")
+    ctx.JSON(200, getAllCategories())
+  })
+
+  r.POST("/api/categories", func (ctx *gin.Context) {
+    var category Category
+    ctx.Bind(&category)
+    ctx.JSON(200, insertCategory(category))
+  })
+
+  r.DELETE("/api/categories", func (ctx *gin.Context) {
+    /* take whole product object */
+    // var product Product
+    // ctx.Bind(&product)
+    // ctx.JSON(200, deleteProduct(product.ID))
+
+    /* only take ID */
+    var id int
+    ctx.Bind(&id)
+    ctx.JSON(200, deleteCategory(id))
+  })
+
+  r.PUT("/api/categories", func (ctx *gin.Context) {
+    var category Category
+    ctx.Bind(&category)
+    ctx.JSON(200, updateCategory(category))
+  })
+
   r.Run(":4001")
 }
