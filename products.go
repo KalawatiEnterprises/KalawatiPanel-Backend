@@ -140,7 +140,7 @@ func deleteProduct(productId int) bool {
   return true
 }
 
-func updateProduct(product Product) bool {
+func updateProduct(p Product) bool {
   // update product details
   query, err := db.Prepare(`
   UPDATE Products SET
@@ -151,7 +151,7 @@ func updateProduct(product Product) bool {
   if err != nil {
     panic(err)
   }
-  _ , err = query.Exec(product.Name, product.Description, product.Brand.ID, product.ID)
+  _ , err = query.Exec(p.Name, p.Description, p.Brand.ID, p.ID)
   if err != nil {
     panic(err)
   }
@@ -161,14 +161,14 @@ func updateProduct(product Product) bool {
   if err != nil {
     panic(err)
   }
-  _ , err = query.Exec(product.ID)
+  _ , err = query.Exec(p.ID)
   if err != nil {
     panic(err)
   }
 
   // (re)add the new categories
-  for _, i := range product.Categories {
-    addProductCategory(product.ID, i.ID)
+  for _, i := range p.Categories {
+    addProductCategory(p.ID, i.ID)
   }
 
   return true

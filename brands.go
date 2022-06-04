@@ -20,8 +20,75 @@ package main
 
 type Brand struct {
   ID          int
-  Name        string
+  Name        *string
   DisplayName string
-  LogoURL     string
-  Website     string
+  LogoURL     *string
+  Website     *string
+}
+
+func getAllBrands() []Brand {
+  rows, err := db.Query("SELECT ID, Name, DisplayName, LogoURL, Website FROM Brands")
+  if err != nil {
+    panic(err)
+  }
+  defer rows.Close()
+
+  var brands []Brand
+  for rows.Next() {
+    var b Brand
+    if err := rows.Scan(&b.ID, &b.Name, &b.DisplayName, &b.LogoURL, &b.Website); err != nil {
+      panic(err)
+    }
+    brands = append(brands, b)
+  }
+
+  return brands
+}
+
+func insertBrand(b Brand) bool {
+  query, err := db.Prepare("INSERT INTO Brands (Name, DisplayName, LogoURL, Website) VALUES (?, ?, ?, ?)")
+  if err != nil {
+    panic(err)
+  }
+  defer query.Close()
+
+  _, err = query.Exec(b.Name, b.DisplayName, b.LogoURL, b.Website)
+  if err != nil {
+    panic(err)
+  }
+
+  return true
+}
+
+func deleteBrand(brandId int) bool {
+  query, err := db.Prepare("DELETE From Brands WHERE ID = ?")
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(brandId)
+  if err != nil {
+    panic(err)
+  }
+
+  return true
+}
+
+func updateBrand(b Brand) bool {
+  // update product details
+  query, err := db.Prepare(`
+  UPDATE Brands SET
+  Name        = ?,
+  DisplayName = ?,
+  LogoURL     = ?,
+  Website     = ?
+  WHERE ID    = ?`)
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(b.Name, b.DisplayName, b.LogoURL, b.Website, b.ID)
+  if err != nil {
+    panic(err)
+  }
+
+  return true
 }

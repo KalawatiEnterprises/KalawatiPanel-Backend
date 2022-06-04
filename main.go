@@ -27,6 +27,7 @@ func main() {
   r.Use(gin.Logger())
   r.Use(gin.Recovery())
 
+  // product routes
   r.GET("/api/products", func (ctx *gin.Context) {
     ctx.Header("Content-Type", "application/json")
     ctx.JSON(200, getAllProducts())
@@ -54,6 +55,36 @@ func main() {
     var product Product
     ctx.Bind(&product)
     ctx.JSON(200, updateProduct(product))
+  })
+
+  // brand routes
+  r.GET("/api/brands", func (ctx *gin.Context) {
+    ctx.Header("Content-Type", "application/json")
+    ctx.JSON(200, getAllBrands())
+  })
+
+  r.POST("/api/brands", func (ctx *gin.Context) {
+    var brand Brand
+    ctx.Bind(&brand)
+    ctx.JSON(200, insertBrand(brand))
+  })
+
+  r.DELETE("/api/brands", func (ctx *gin.Context) {
+    /* take whole product object */
+    // var product Product
+    // ctx.Bind(&product)
+    // ctx.JSON(200, deleteProduct(product.ID))
+
+    /* only take ID */
+    var id int
+    ctx.Bind(&id)
+    ctx.JSON(200, deleteBrand(id))
+  })
+
+  r.PUT("/api/brands", func (ctx *gin.Context) {
+    var brand Brand
+    ctx.Bind(&brand)
+    ctx.JSON(200, updateBrand(brand))
   })
 
   r.Run(":4001")
