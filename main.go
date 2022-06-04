@@ -50,5 +50,11 @@ func main() {
     ctx.JSON(200, deleteProduct(id))
   })
 
+  r.PUT("/api/products", func (ctx *gin.Context) {
+    var product Product
+    ctx.Bind(&product)
+    ctx.JSON(200, updateProduct(product))
+  })
+
   r.Run(":4001")
 }

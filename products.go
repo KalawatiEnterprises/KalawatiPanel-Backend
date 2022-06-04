@@ -20,7 +20,6 @@ package main
 
 import (
 	"strconv"
-  "fmt"
 )
 
 type Product struct {
@@ -127,10 +126,9 @@ func deleteProduct(productId int) bool {
   if err != nil {
     panic(err)
   }
-  fmt.Println(productId)
 
   // then delete product
-  query, err = db.Prepare("DELETE From Products WHERE ID = ?")
+  query, err = db.Prepare("DELETE FROM Products WHERE ID = ?")
   if err != nil {
     panic(err)
   }
@@ -142,3 +140,49 @@ func deleteProduct(productId int) bool {
   return true
 }
 
+func updateProduct(product Product) bool {
+  // update product details
+  query, err := db.Prepare(`
+  UPDATE Products SET
+  Name        = ?,
+  Description = ?,
+  BrandID     = ?
+  WHERE ID    = ?`)
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(product.Name, product.Description, product.Brand.ID, product.ID)
+  if err != nil {
+    panic(err)
+  }
+
+  // delete all categories to avoid duplicates
+  query, err = db.Prepare("DELETE FROM Product_Categories WHERE ProductID = ?")
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(product.ID)
+  if err != nil {
+    panic(err)
+  }
+
+  // (re)add the new categories
+  for _, i := range product.Categories {
+    addProductCategory(product.ID, i.ID)
+  }
+
+  return true
+}
+
+func addProductCategory(productId, categoryId int) {
+  query, err := db.Prepare("INSERT INTO Product_Categories (ProductID, CategoryID) VALUES (?, ?)")
+  if err != nil {
+    panic(err)
+  }
+  defer query.Close()
+
+  _, err = query.Exec(productId, categoryId)
+  if err != nil {
+    panic(err)
+  }
+}

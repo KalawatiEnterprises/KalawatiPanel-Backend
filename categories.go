@@ -48,15 +48,3 @@ func getCategory(categoryId int) Category {
   return category
 }
 
-func addProductCategory(productId, categoryId int) {
-  query, err := db.Prepare("INSERT INTO Product_Categories (ProductID, CategoryID) VALUES (?, ?)")
-  if err != nil {
-    panic(err)
-  }
-  defer query.Close()
-
-  _, err = query.Exec(productId, categoryId)
-  if err != nil {
-    panic(err)
-  }
-}
