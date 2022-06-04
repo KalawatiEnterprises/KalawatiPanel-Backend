@@ -20,6 +20,7 @@ package main
 
 import (
 	"strconv"
+  "fmt"
 )
 
 type Product struct {
@@ -115,3 +116,29 @@ func insertProduct(p Product) bool {
 
   return true
 }
+
+func deleteProduct(productId int) bool {
+  // delete categories first
+  query, err := db.Prepare("DELETE From Product_Categories WHERE ProductID = ?")
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(productId)
+  if err != nil {
+    panic(err)
+  }
+  fmt.Println(productId)
+
+  // then delete product
+  query, err = db.Prepare("DELETE From Products WHERE ID = ?")
+  if err != nil {
+    panic(err)
+  }
+  _ , err = query.Exec(productId)
+  if err != nil {
+    panic(err)
+  }
+
+  return true
+}
+

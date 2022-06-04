@@ -35,8 +35,19 @@ func main() {
   r.POST("/api/products", func (ctx *gin.Context) {
     var product Product
     ctx.Bind(&product)
-    ctx.Header("Content-Type", "application/json")
     ctx.JSON(200, insertProduct(product))
+  })
+
+  r.DELETE("/api/products", func (ctx *gin.Context) {
+    /* take whole product object */
+    // var product Product
+    // ctx.Bind(&product)
+    // ctx.JSON(200, deleteProduct(product.ID))
+
+    /* only take ID */
+    var id int
+    ctx.Bind(&id)
+    ctx.JSON(200, deleteProduct(id))
   })
 
   r.Run(":4001")
