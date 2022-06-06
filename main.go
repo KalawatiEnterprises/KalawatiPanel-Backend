@@ -40,15 +40,9 @@ func main() {
   })
 
   r.DELETE("/api/products", func (ctx *gin.Context) {
-    /* take whole product object */
     var product Product
     ctx.Bind(&product)
     ctx.JSON(200, deleteProduct(product.ID))
-
-    /* only take ID */
-    // var id int
-    // ctx.Bind(&id)
-    // ctx.JSON(200, deleteProduct(id))
   })
 
   r.PUT("/api/products", func (ctx *gin.Context) {
@@ -70,15 +64,9 @@ func main() {
   })
 
   r.DELETE("/api/brands", func (ctx *gin.Context) {
-    /* take whole product object */
-    // var product Product
-    // ctx.Bind(&product)
-    // ctx.JSON(200, deleteProduct(product.ID))
-
-    /* only take ID */
-    var id int
-    ctx.Bind(&id)
-    ctx.JSON(200, deleteBrand(id))
+    var brand Brand
+    ctx.Bind(&brand)
+    ctx.JSON(200, deleteBrand(brand.ID))
   })
 
   r.PUT("/api/brands", func (ctx *gin.Context) {
@@ -100,15 +88,9 @@ func main() {
   })
 
   r.DELETE("/api/categories", func (ctx *gin.Context) {
-    /* take whole product object */
-    // var product Product
-    // ctx.Bind(&product)
-    // ctx.JSON(200, deleteProduct(product.ID))
-
-    /* only take ID */
-    var id int
-    ctx.Bind(&id)
-    ctx.JSON(200, deleteCategory(id))
+    var category Category
+    ctx.Bind(&category)
+    ctx.JSON(200, deleteCategory(category.ID))
   })
 
   r.PUT("/api/categories", func (ctx *gin.Context) {
