@@ -18,7 +18,9 @@
 
 package main
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type Category struct {
   ID     int
@@ -81,7 +83,12 @@ func insertCategory(c Category) bool {
   }
   defer query.Close()
 
-  _, err = query.Exec(c.Parent.ID, c.Name)
+  if c.Parent.ID < 1 {
+    _, err = query.Exec(nil, c.Name)
+  } else {
+    _, err = query.Exec(c.Parent.ID, c.Name)
+  }
+
   if err != nil {
     panic(err)
   }
@@ -148,7 +155,13 @@ func updateCategory(c Category) bool {
   if err != nil {
     panic(err)
   }
-  _ , err = query.Exec(c.Parent.ID, c.Name, c.ID)
+
+  if c.Parent.ID < 1 {
+    _, err = query.Exec(nil, c.Name, c.ID)
+  } else {
+    _, err = query.Exec(c.Parent.ID, c.Name, c.ID)
+  }
+
   if err != nil {
     panic(err)
   }
