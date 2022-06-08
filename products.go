@@ -20,9 +20,8 @@ package main
 
 import (
   "strconv"
-  "github.com/joho/godotenv"
   "os"
-  "fmt"
+  "io/ioutil"
 )
 
 type Product struct {
@@ -31,15 +30,12 @@ type Product struct {
   Description *string
   Brand       Brand
   Categories  []Category
+  Images      []string
 }
 
 var imagesDir string
 
 func init() {
-  err := godotenv.Load()
-  if err != nil {
-    panic(err)
-  }
   imagesDir = os.Getenv("PRODUCT_IMAGES_DIR")
 }
 
@@ -67,6 +63,16 @@ func getAllProducts() []Product {
     }
 
     p.Categories = getProductCategories(p.ID)
+
+    idString := strconv.Itoa(p.ID)
+    imgs, err := ioutil.ReadDir(imagesDir + idString)
+    if err != nil {
+      panic(err)
+    }
+    for _, i := range imgs {
+      p.Images = append(p.Images, "images/" + idString + "/" + i.Name())
+    }
+
     products = append(products, p)
   }
 
@@ -127,9 +133,7 @@ func insertProduct(p Product) bool {
   }
 
   // create images folder for the product
-  dir := imagesDir + strconv.Itoa(int(newID))
-  fmt.Println(dir)
-  err = os.Mkdir(dir, os.ModePerm)
+  err = os.Mkdir(imagesDir + strconv.Itoa(int(newID)), os.ModePerm)
   if err != nil {
     panic(err)
   }

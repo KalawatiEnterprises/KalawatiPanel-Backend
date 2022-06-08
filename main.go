@@ -20,12 +20,16 @@ package main
 
 import (
   "github.com/gin-gonic/gin"
+  "os"
 )
 
 func main() {
   r := gin.New()
   r.Use(gin.Logger())
   r.Use(gin.Recovery())
+
+  // serve static (image) files
+  r.Static("/images", os.Getenv("PRODUCT_IMAGES_DIR"))
 
   // product routes
   r.GET("/api/products", func (ctx *gin.Context) {
