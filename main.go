@@ -103,5 +103,20 @@ func main() {
     ctx.JSON(200, updateCategory(category))
   })
 
+  // image routes
+  r.GET("/api/images/:productId", func (ctx *gin.Context) {
+    ctx.JSON(200, getImages(ctx.Param("productId")))
+  })
+
+  r.POST("/api/images/", func (ctx *gin.Context) {
+    ctx.JSON(200, insertImage(ctx))
+  })
+
+  r.DELETE("/api/images/", func (ctx *gin.Context) {
+    var imagePath string
+    ctx.Bind(&imagePath)
+    ctx.JSON(200, deleteImage(imagePath))
+  })
+
   r.Run(":4001")
 }

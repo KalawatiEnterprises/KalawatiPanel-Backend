@@ -21,7 +21,6 @@ package main
 import (
   "strconv"
   "os"
-  "io/ioutil"
 )
 
 type Product struct {
@@ -63,15 +62,7 @@ func getAllProducts() []Product {
     }
 
     p.Categories = getProductCategories(p.ID)
-
-    idString := strconv.Itoa(p.ID)
-    imgs, err := ioutil.ReadDir(imagesDir + idString)
-    if err != nil {
-      panic(err)
-    }
-    for _, i := range imgs {
-      p.Images = append(p.Images, "images/" + idString + "/" + i.Name())
-    }
+    p.Images = getImages(strconv.Itoa(p.ID))
 
     products = append(products, p)
   }
