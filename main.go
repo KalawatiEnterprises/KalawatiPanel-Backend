@@ -21,6 +21,8 @@ package main
 import (
   "github.com/gin-gonic/gin"
   "os"
+  "encoding/json"
+  "fmt"
 )
 
 func main() {
@@ -37,21 +39,21 @@ func main() {
     ctx.JSON(200, getAllProducts())
   })
 
-  r.POST("/api/products", func (ctx *gin.Context) {
+  r.POST("/api/products", passwdMiddleware(), func (ctx *gin.Context) {
     var product Product
-    ctx.Bind(&product)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &product)
     ctx.JSON(200, insertProduct(product))
   })
 
-  r.DELETE("/api/products", func (ctx *gin.Context) {
+  r.DELETE("/api/products", passwdMiddleware(), func (ctx *gin.Context) {
     var product Product
-    ctx.Bind(&product)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &product)
     ctx.JSON(200, deleteProduct(product.ID))
   })
 
-  r.PUT("/api/products", func (ctx *gin.Context) {
+  r.PUT("/api/products", passwdMiddleware(), func (ctx *gin.Context) {
     var product Product
-    ctx.Bind(&product)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &product)
     ctx.JSON(200, updateProduct(product))
   })
 
@@ -61,21 +63,21 @@ func main() {
     ctx.JSON(200, getAllBrands())
   })
 
-  r.POST("/api/brands", func (ctx *gin.Context) {
+  r.POST("/api/brands", passwdMiddleware(), func (ctx *gin.Context) {
     var brand Brand
-    ctx.Bind(&brand)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &brand)
     ctx.JSON(200, insertBrand(brand))
   })
 
-  r.DELETE("/api/brands", func (ctx *gin.Context) {
+  r.DELETE("/api/brands", passwdMiddleware(), func (ctx *gin.Context) {
     var brand Brand
-    ctx.Bind(&brand)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &brand)
     ctx.JSON(200, deleteBrand(brand.ID))
   })
 
-  r.PUT("/api/brands", func (ctx *gin.Context) {
+  r.PUT("/api/brands", passwdMiddleware(), func (ctx *gin.Context) {
     var brand Brand
-    ctx.Bind(&brand)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &brand)
     ctx.JSON(200, updateBrand(brand))
   })
 
@@ -85,21 +87,21 @@ func main() {
     ctx.JSON(200, getAllCategories())
   })
 
-  r.POST("/api/categories", func (ctx *gin.Context) {
+  r.POST("/api/categories", passwdMiddleware(), func (ctx *gin.Context) {
     var category Category
-    ctx.Bind(&category)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &category)
     ctx.JSON(200, insertCategory(category))
   })
 
-  r.DELETE("/api/categories", func (ctx *gin.Context) {
+  r.DELETE("/api/categories", passwdMiddleware(), func (ctx *gin.Context) {
     var category Category
-    ctx.Bind(&category)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &category)
     ctx.JSON(200, deleteCategory(category.ID))
   })
 
-  r.PUT("/api/categories", func (ctx *gin.Context) {
+  r.PUT("/api/categories", passwdMiddleware(), func (ctx *gin.Context) {
     var category Category
-    ctx.Bind(&category)
+    json.Unmarshal([]byte(ctx.PostForm("data")), &category)
     ctx.JSON(200, updateCategory(category))
   })
 
@@ -108,14 +110,12 @@ func main() {
     ctx.JSON(200, getImages(ctx.Param("productId")))
   })
 
-  r.POST("/api/images/", func (ctx *gin.Context) {
+  r.POST("/api/images/", passwdMiddleware(), func (ctx *gin.Context) {
     ctx.JSON(200, insertImage(ctx))
   })
 
-  r.DELETE("/api/images/", func (ctx *gin.Context) {
-    var imagePath string
-    ctx.Bind(&imagePath)
-    ctx.JSON(200, deleteImage(imagePath))
+  r.DELETE("/api/images/", passwdMiddleware(), func (ctx *gin.Context) {
+    ctx.JSON(200, deleteImage(ctx.PostForm("path")))
   })
 
   r.Run(":4001")
