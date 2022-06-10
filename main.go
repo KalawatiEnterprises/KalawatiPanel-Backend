@@ -22,12 +22,17 @@ import (
   "github.com/gin-gonic/gin"
   "os"
   "encoding/json"
+  "github.com/gin-contrib/cors"
 )
 
 func main() {
   r := gin.New()
   r.Use(gin.Logger())
   r.Use(gin.Recovery())
+
+  r.Use(cors.New(cors.Config{
+    AllowOrigins: []string{"http://localhost:3000"},
+  }))
 
   // serve static (image) files
   r.Static("/images", os.Getenv("PRODUCT_IMAGES_DIR"))
