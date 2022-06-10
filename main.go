@@ -22,7 +22,6 @@ import (
   "github.com/gin-gonic/gin"
   "os"
   "encoding/json"
-  "fmt"
 )
 
 func main() {
